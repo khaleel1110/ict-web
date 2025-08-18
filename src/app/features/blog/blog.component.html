@@ -1,0 +1,193 @@
+<main id="content" role="main">
+  <!-- Hero -->
+  <div class="position-relative">
+    <!-- Swiper Main Slider -->
+    <div class="swiper swiper-js-container">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide d-flex gradient-x-overlay-sm-dark bg-img-start" style="background-image: url(/stadium1.jpg); min-height: 40rem; background-position: bottom, center">
+          <div class="container d-flex align-items-center" style="min-height: 40rem;">
+            <div class="w-lg-50 me-3">
+              <div class="mb-5">
+                <h2 class="h1 text-white">The Iconic Exterior – A Fortress of Glory</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide d-flex gradient-x-overlay-sm-dark bg-img-start" style="background-image: url(/stadium3.jpg); min-height: 40rem; background-position: bottom center">
+          <div class="container d-flex align-items-center" style="min-height: 40rem;">
+            <div class="w-lg-50 me-3">
+              <div class="mb-5">
+                <h2 class="h1 text-white">Where Legends Are Made</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="swiper-slide d-flex gradient-x-overlay-sm-dark bg-img-start" style="background-image: url(/stadium4.jpg); min-height: 40rem; background-position: top center">
+          <div class="container d-flex align-items-center" style="min-height: 40rem;">
+            <div class="w-lg-50 me-3">
+              <div class="mb-5">
+                <h2 class="h1 text-white">Victory Arena</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Swiper Pagination -->
+      <div class="swiper-pagination swiper-pagination-light swiper-pagination-vertical swiper-pagination-middle-y-end me-3 d-lg-none"></div>
+    </div>
+    <!-- End Swiper Main Slider -->
+
+    <!-- Swiper Thumbs Slider -->
+    <div class="d-none d-lg-block container translate-middle-y position-absolute top-50 start-0 end-0 zi-2">
+      <div class="translate-middle-y position-absolute top-50 end-0">
+        <div class="js-swiper-blog-journal-hero-thumbs swiper" style="opacity:0; max-width: 13rem;">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide swiper-pagination-progress swiper-pagination-progress-light py-3">
+              <p class="text-white">Front Interview with a Lead Designer of the Hubble</p>
+              <div class="swiper-pagination-progress-body">
+                <div class="js-swiper-pagination-progress-body-helper swiper-pagination-progress-body-helper"></div>
+              </div>
+            </div>
+            <div class="swiper-slide swiper-pagination-progress swiper-pagination-progress-light py-3">
+              <p class="text-white">Front Corporate - let's work together</p>
+              <div class="swiper-pagination-progress-body">
+                <div class="js-swiper-pagination-progress-body-helper swiper-pagination-progress-body-helper"></div>
+              </div>
+            </div>
+            <div class="swiper-slide swiper-pagination-progress swiper-pagination-progress-light py-3">
+              <p class="text-white">How Google Assistant now helps you record stories</p>
+              <div class="swiper-pagination-progress-body">
+                <div class="js-swiper-pagination-progress-body-helper swiper-pagination-progress-body-helper"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Swiper Thumbs Slider -->
+  </div>
+  <!-- End Hero -->
+
+  <!-- Card Grid -->
+  <div class="container content-space-2 content-space-lg-3">
+    <div class="row justify-content-lg-between">
+      <div class="col-lg-8 mb-10 mb-lg-0">
+        <div class="text-center text-lowercase pb-4 mb-4">
+          <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+          <h1 style="font-family: 'Anton', sans-serif;">2day Matches</h1>
+        </div>
+        <div class="d-grid gap-7 mb-7">
+          <!-- Card -->
+          <div class="card card-flush card-stretched-vertical">
+            @for (post of todayUsers(); track post; let i = $index) {
+              <div class="card card-flush card-stretched-vertical mb-4">
+                <div class="row">
+                  <div class="col-sm-5">
+                    <img style="height: 13rem;" class="card-img" [src]="getImage(i)" alt="Image Description">
+                  </div>
+                  <!-- End Col -->
+
+                  <div class="col-sm-7">
+                    <!-- Card Body -->
+                    <div class="card-body">
+                      <div class="mb-2">
+                        <a class="card-link text-uppercase text-primary fw-semibold">Hot Match</a>
+                      </div>
+
+                      <h3 class="card-title mb-2">
+                        <a href="#" class="text-dark text-decoration-none text-uppercase">{{ post.teamA }} vs {{ post.teamB }}</a>
+                      </h3>
+                      <p class="card-text text-muted mb-2">📅 {{ post.appointmentDate | date: 'mediumDate' }}</p>
+                      <p class="card-text text-muted mb-2">⏰ {{ formatTime(post.appointmentStartHour, post.appointmentDuration) }}</p>
+
+                      <p class="card-text">
+                        {{ getDescription(i) }}
+                      </p>
+                    </div>
+                    <!-- End Card Body -->
+                  </div>
+                  <!-- End Col -->
+                </div>
+              </div>
+            } @empty {
+              <div class="card card-flush card-stretched-vertical">
+                <div class="card-body text-center">
+                  <p class="text-muted">No matches scheduled for today.</p>
+                </div>
+              </div>
+            }
+          </div>
+          <!-- End Card -->
+        </div>
+
+        <!-- Sticky Block End Point -->
+        <div id="stickyBlockEndPoint"></div>
+      </div>
+      <!-- End Col -->
+
+      <div class="col-lg-3">
+        <div class="mb-7">
+          <div class="mb-3">
+            <h3>Match News</h3>
+          </div>
+
+          <!-- Form -->
+          <form>
+            <div class="mb-2">
+              <input type="text" class="form-control" placeholder="Enter email" aria-label="Enter email">
+            </div>
+            <div class="d-grid">
+              <button type="button" class="btn btn-primary">Subscribe</button>
+            </div>
+          </form>
+          <!-- End Form -->
+
+          <p class="form-text">Join the Fans Behind the Fortress – Subscribe Now!</p>
+        </div>
+
+        <div class="mb-7">
+          <div class="mb-3">
+            <h3>UP Coming Matches</h3>
+          </div>
+
+          <!-- List Group -->
+          <ul class="list-group list-group-lg">
+            @for (match of futureUsers(); track match) {
+              <li class="list-group-item">
+                <a href="#">
+                  <div class="row align-items-center">
+                    <div class="col">
+                      <h5 class="mb-1">{{ match.teamA }} vs {{ match.teamB }}</h5>
+                      <p class="text-body small mb-0">📅 {{ match.appointmentDate | date: 'mediumDate' }} at {{ formatTime(match.appointmentStartHour, match.appointmentDuration) }}</p>
+                    </div>
+                    <!-- End Col -->
+
+                    <div class="col-auto">
+                      <i class="bi-chevron-right"></i>
+                    </div>
+                    <!-- End Col -->
+                  </div>
+                  <!-- End Row -->
+                </a>
+              </li>
+            } @empty {
+              <li class="list-group-item">
+                <p class="text-muted mb-0">No upcoming matches.</p>
+              </li>
+            }
+          </ul>
+          <!-- End List Group -->
+        </div>
+
+        <!-- Sticky Block Start Point -->
+        <div id="stickyBlockStartPoint"></div>
+      </div>
+      <!-- End Col -->
+    </div>
+    <!-- End Row -->
+  </div>
+  <!-- End Card Grid -->
+</main>
