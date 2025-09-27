@@ -57,8 +57,8 @@ export class BookingComponent implements OnInit {
       teamB: ['', [Validators.required, Validators.minLength(2)]],
       address: ['', [Validators.required, Validators.minLength(5)]],
       event: ['', Validators.required],
-      hostel: ['', Validators.required],
-      department: ['', Validators.required],
+    /*  hostel: ['', Validators.required],
+      department: ['', Validators.required],*/
       appointmentDate: [null, Validators.required],
       appointmentStartHour: [null, Validators.required],
       appointmentDuration: [null, [Validators.required, Validators.min(1), Validators.max(8)]],
@@ -197,8 +197,8 @@ export class BookingComponent implements OnInit {
       gender: this.sanitizeInput(this.profileForm.get('gender')?.value),
       teamA: this.sanitizeInput(this.profileForm.get('teamA')?.value),
       event: this.sanitizeInput(this.profileForm.get('event')?.value),
-      hostel: this.sanitizeInput(this.profileForm.get('hostel')?.value),
-      department: this.sanitizeInput(this.profileForm.get('department')?.value),
+ /*     hostel: this.sanitizeInput(this.profileForm.get('hostel')?.value),
+      department: this.sanitizeInput(this.profileForm.get('department')?.value),*/
       teamB: this.sanitizeInput(this.profileForm.get('teamB')?.value),
       address: this.sanitizeInput(this.profileForm.get('address')?.value),
       appointmentDate: this.appointmentData.date,
