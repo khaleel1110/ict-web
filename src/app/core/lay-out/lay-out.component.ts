@@ -12,9 +12,9 @@ import {FooterComponent} from '../footer/footer.component';
     FooterComponent
   ],
   template: `
-    <app-header></app-header>
+
    <router-outlet></router-outlet>
-    <app-footer></app-footer>
+<!--    <app-footer></app-footer>-->
   `,
 })
 export class LayOutComponent {

@@ -1,0 +1,78 @@
+<!-- track-status.component.html -->
+<main id="content" role="main" class="bg-light">
+  <div class="navbar-dark bg-dark mt-5" style="background-image: url(/assets/svg/components/wave-pattern-light.svg);">
+    <div class="container content-space-1 content-space-b-lg-3">
+      <h1 class="h2 text-white">Track Your Ticket</h1>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb breadcrumb-light mb-0">
+          <li class="breadcrumb-item">Home</li>
+          <li class="breadcrumb-item active" aria-current="page">Track Status</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container content-space-1 content-space-t-lg-0 content-space-b-lg-2 mt-lg-n10">
+    <div class="row">
+      <div class="col-lg-2"></div>
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-header border-bottom py-4">
+            <h4 class="card-header-title">Look up a complaint</h4>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="searchForm">
+              <div class="row mb-4">
+                <label for="ticketId" class="col-sm-3 col-form-label form-label">Ticket ID</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="ticketId" formControlName="ticketId"
+                         placeholder="ICT-0001"
+                         [ngClass]="{'is-invalid': searchForm.get('ticketId')?.invalid && searchForm.get('ticketId')?.touched}">
+                  <div *ngIf="searchForm.get('ticketId')?.invalid && searchForm.get('ticketId')?.touched" class="invalid-feedback">
+                    Ticket ID is required
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-2">
+                <label for="email" class="col-sm-3 col-form-label form-label">Email used to report</label>
+                <div class="col-sm-9">
+                  <input type="email" class="form-control" id="email" formControlName="email"
+                         placeholder="you@example.com"
+                         [ngClass]="{'is-invalid': searchForm.get('email')?.invalid && searchForm.get('email')?.touched}">
+                  <div *ngIf="searchForm.get('email')?.invalid && searchForm.get('email')?.touched" class="invalid-feedback">
+                    A valid email is required
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="card-footer d-flex align-items-center justify-content-between">
+            <a routerLink="/">Report a new issue instead</a>
+            <button (click)="search()" type="button" class="btn btn-primary">Check status</button>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div class="card" *ngIf="result">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h5 class="mb-0">{{ result.ticketId }}</h5>
+              <span class="badge" [ngClass]="statusBadgeClass(result.status)">{{ result.status }}</span>
+            </div>
+            <p class="mb-1"><strong>Category:</strong> {{ result.category }}</p>
+            <p class="mb-1"><strong>Priority:</strong> {{ result.priority }}</p>
+            <p class="mb-1"><strong>Reported:</strong> {{ result.dateReported | date:'medium' }}</p>
+            <p class="mb-1" *ngIf="result.assignedTechnician"><strong>Technician:</strong> {{ result.assignedTechnician }}</p>
+            <p class="mb-3"><strong>Description:</strong> {{ result.description }}</p>
+            <p class="mb-0" *ngIf="result.adminNotes"><strong>ICT Team notes:</strong> {{ result.adminNotes }}</p>
+          </div>
+        </div>
+
+        <!-- Not found -->
+        <div class="alert alert-soft-danger" role="alert" *ngIf="searched && notFound">
+          No matching ticket found for that ID and email combination. Please double-check and try again.
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

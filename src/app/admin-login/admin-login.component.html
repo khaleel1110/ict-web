@@ -1,0 +1,152 @@
+<!-- admin-login.component.html -->
+
+<main id="content" role="main" class="bg-light">
+  <div class="container my-5 py-5 content-space-2">
+    <div class="row justify-content-center">
+      <div class="row d-flex justify-content-center">
+      <a routerLink="/home"  class="  text-prmary  text-end">home</a>
+      </div>
+    </div>
+ <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+
+        <div class="card">
+
+          <div class="card-header border-bottom py-4 text-center">
+            <h4 class="card-header-title">
+              ICT Admin Login
+            </h4>
+
+            <p class="text-muted mb-0 mt-2">
+              Sign in to access the ICT support dashboard
+            </p>
+          </div>
+
+          <div class="card-body">
+
+            <form
+              [formGroup]="loginForm"
+              (ngSubmit)="submit()"
+            >
+
+              <!-- Email -->
+              <div class="mb-4">
+
+                <label
+                  for="email"
+                  class="form-label"
+                >
+                  Email address
+                </label>
+
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  formControlName="email"
+                  placeholder="admin@example.com"
+                  autocomplete="email"
+                  [ngClass]="{
+                    'is-invalid':
+                      loginForm.get('email')?.invalid &&
+                      loginForm.get('email')?.touched
+                  }"
+                />
+
+                <div
+                  *ngIf="
+                    loginForm.get('email')?.hasError('required') &&
+                    loginForm.get('email')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  Email address is required.
+                </div>
+
+                <div
+                  *ngIf="
+                    loginForm.get('email')?.hasError('email') &&
+                    loginForm.get('email')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  Please enter a valid email address.
+                </div>
+
+              </div>
+
+
+              <!-- Password -->
+              <div class="mb-4">
+
+                <label
+                  for="password"
+                  class="form-label"
+                >
+                  Password
+                </label>
+
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  formControlName="password"
+                  placeholder="••••••••"
+                  autocomplete="current-password"
+                  [ngClass]="{
+                    'is-invalid':
+                      loginForm.get('password')?.invalid &&
+                      loginForm.get('password')?.touched
+                  }"
+                />
+
+                <div
+                  *ngIf="
+                    loginForm.get('password')?.invalid &&
+                    loginForm.get('password')?.touched
+                  "
+                  class="invalid-feedback"
+                >
+                  Password is required.
+                </div>
+
+              </div>
+
+
+              <!-- Error -->
+              <div
+                class="alert alert-soft-danger py-2"
+                role="alert"
+                *ngIf="errorMessage"
+              >
+                {{ errorMessage }}
+              </div>
+
+
+              <!-- Submit -->
+              <button
+                type="submit"
+                class="btn btn-primary w-100"
+                [disabled]="isLoading"
+              >
+
+                <span
+                  *ngIf="isLoading"
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+
+                {{ isLoading ? 'Signing in...' : 'Sign in' }}
+
+              </button>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>

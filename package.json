@@ -6,7 +6,8 @@
     "start-5-aside-web": "ng serve --port 9183",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "start-emulators": "firebase emulators:start --only functions,firestore,auth,pubsub,storage"
   },
   "private": true,
   "dependencies": {

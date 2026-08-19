@@ -1,49 +1,28 @@
 // Setup
-@import '../../../node_modules/bootstrap/scss/functions';
+@import 'bootstrap/scss/functions';
 
 @import 'themes/default';
 @import 'user-variables';
-@import 'front/variables';
+@import 'front-dashboard/variables';
 
-@import '../../../node_modules/bootstrap/scss/variables';
-@import "../../../node_modules/bootstrap/scss/variables-dark";
-@import '../../../node_modules/bootstrap/scss/maps';
-@import '../../../node_modules/bootstrap/scss/utilities';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/variables-dark';
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/utilities';
 
-@import 'front/utilities';
+@import 'front-dashboard/utilities';
 @import 'user-utilities';
 
 // Bootstrap core
-@import '../../../node_modules/bootstrap/scss/bootstrap';
+@import 'bootstrap/scss/bootstrap';
 
 /*----------------------------------------------------------------------
-  * Front - Responsive Website Template version v4.0.0
+  * Front - Responsive Website Template version v2.0.0
   * Copyright 2021 Htmlstream
   * Licensed under Bootstrap Themes (https://themes.getbootstrap.com/licenses/)
 ------------------------------------------------------------------------*/
 
-@import 'front/front';
+@import 'front-dashboard/front-dashboard';
 
 // Custom core
 @import 'user';
-
-:root {
-  overscroll-behavior: none;
-  height: 100vh;
-  overflow-x: hidden; /* Hide horizontal scrollbar */
-}
-
-
-body {
-  overscroll-behavior: none;
-  height: 100vh;
-}
-
-.window-class {
-  z-index: 30000;
-}
-
-.whatsapp-bg {
-  background-color: #25d366;
-  color: #FFFFFF;
-}

@@ -1,0 +1,148 @@
+<!-- issue-list.component.html -->
+<main id="content" role="main" class="bg-light">
+  <div class="navbar-dark bg-dark mt-5" style="background-image: url(/assets/svg/components/wave-pattern-light.svg);">
+    <div class="container content-space-1 content-space-b-lg-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h2 text-white">ICT Support — Admin Dashboard</h1>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-light mb-0">
+              <li class="breadcrumb-item">Admin</li>
+              <li class="breadcrumb-item active" aria-current="page">Issues</li>
+            </ol>
+          </nav>
+        </div>
+        <button (click)="logout()" type="button" class="btn btn-outline-light btn-sm">Log out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container content-space-1 content-space-t-lg-0 content-space-b-lg-2 mt-lg-n10">
+
+    <!-- Summary cards -->
+    <div class="row mb-4">
+      <div class="col-6 col-md-3 mb-3 mb-md-0">
+        <div class="card text-center py-3">
+          <span class="h3 mb-0">{{ counts.total }}</span>
+          <span class="text-muted small">Total</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3 mb-3 mb-md-0">
+        <div class="card text-center py-3">
+          <span class="h3 mb-0 text-danger">{{ counts.open }}</span>
+          <span class="text-muted small">Open</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center py-3">
+          <span class="h3 mb-0 text-warning">{{ counts.inProgress }}</span>
+          <span class="text-muted small">In Progress</span>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center py-3">
+          <span class="h3 mb-0 text-success">{{ counts.resolved }}</span>
+          <span class="text-muted small">Resolved</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header border-bottom py-4">
+        <div class="row align-items-center g-3">
+          <div class="col-md-4">
+            <input type="text" class="form-control" placeholder="Search ticket, name, or email"
+                   [(ngModel)]="searchTerm" name="searchTerm">
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" [(ngModel)]="statusFilter" name="statusFilter">
+              <option value="All">All statuses</option>
+              <option value="Open">Open</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" [(ngModel)]="categoryFilter" name="categoryFilter">
+              <option value="All">All categories</option>
+              <option value="hardware">Hardware</option>
+              <option value="software">Software</option>
+              <option value="network">Network</option>
+              <option value="account">Account</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="col-md-2 text-md-end">
+            <button (click)="addIssue()" type="button" class="btn btn-primary w-100">+ Add issue</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="thead-light">
+              <tr>
+                <th>Ticket</th>
+                <th>Reporter</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Reported</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let issue of filteredIssues">
+                <td class="fw-semibold">{{ issue.ticketId }}</td>
+                <td>
+                  {{ issue.fullName }}<br>
+                  <span class="text-muted small">{{ issue.email }}</span>
+                </td>
+                <td class="text-capitalize">{{ issue.category }}</td>
+                <td>{{ issue.priority }}</td>
+                <td><span class="badge" [ngClass]="statusBadgeClass(issue.status)">{{ issue.status }}</span></td>
+                <td>{{ issue.dateReported | date:'shortDate' }}</td>
+                <td class="text-end">
+                  <button (click)="viewIssue(issue)" type="button" class="btn btn-white btn-sm">View</button>
+                  <button (click)="editIssue(issue.id)" type="button" class="btn btn-white btn-sm">Edit</button>
+                  <button (click)="deleteIssue(issue.id)" type="button" class="btn btn-white btn-sm text-danger">Delete</button>
+                </td>
+              </tr>
+              <tr *ngIf="filteredIssues.length === 0">
+                <td colspan="7" class="text-center text-muted py-5">No issues match your filters.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick view -->
+  <div class="modal-backdrop-custom" *ngIf="selectedIssue"
+       style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1050;"
+       (click)="closeView()">
+    <div class="card" style="max-width: 500px; width: 90%;" (click)="$event.stopPropagation()">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ selectedIssue.ticketId }}</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeView()"></button>
+      </div>
+      <div class="card-body">
+        <p class="mb-1"><strong>Reporter:</strong> {{ selectedIssue.fullName }} ({{ selectedIssue.email }})</p>
+        <p class="mb-1"><strong>Phone:</strong> {{ selectedIssue.phone || 'N/A' }}</p>
+        <p class="mb-1"><strong>Department:</strong> {{ selectedIssue.department || 'N/A' }}</p>
+        <p class="mb-1"><strong>Category:</strong> {{ selectedIssue.category }}</p>
+        <p class="mb-1"><strong>Priority:</strong> {{ selectedIssue.priority }}</p>
+        <p class="mb-1"><strong>Status:</strong> {{ selectedIssue.status }}</p>
+        <p class="mb-1" *ngIf="selectedIssue.assignedTechnician"><strong>Technician:</strong> {{ selectedIssue.assignedTechnician }}</p>
+        <p class="mb-1"><strong>Description:</strong> {{ selectedIssue.description }}</p>
+        <p class="mb-0" *ngIf="selectedIssue.adminNotes"><strong>Notes:</strong> {{ selectedIssue.adminNotes }}</p>
+      </div>
+      <div class="card-footer text-end">
+        <button (click)="editIssue(selectedIssue.id)" type="button" class="btn btn-primary btn-sm">Edit this issue</button>
+      </div>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,125 @@
+<!-- issue-form.component.html -->
+<main id="content" role="main" class="bg-light">
+  <div class="container content-space-2">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header border-bottom py-4">
+            <h4 class="card-header-title">{{ isEditMode ? 'Edit issue' : 'Add issue' }}</h4>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="form" id="issueForm" aria-live="polite">
+
+              <div class="row mb-4">
+                <label for="fullName" class="col-sm-3 col-form-label form-label">Reporter name</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="fullName" formControlName="fullName"
+                         [ngClass]="{'is-invalid': form.get('fullName')?.invalid && form.get('fullName')?.touched}">
+                  <div *ngIf="form.get('fullName')?.invalid && form.get('fullName')?.touched" class="invalid-feedback">
+                    Reporter name is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="email" class="col-sm-3 col-form-label form-label">Email</label>
+                <div class="col-sm-9">
+                  <input type="email" class="form-control" id="email" formControlName="email"
+                         [ngClass]="{'is-invalid': form.get('email')?.invalid && form.get('email')?.touched}">
+                  <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="invalid-feedback">
+                    A valid email is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="phone" class="col-sm-3 col-form-label form-label">Phone</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="phone" formControlName="phone">
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="department" class="col-sm-3 col-form-label form-label">Department</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="department" formControlName="department">
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="category" class="col-sm-3 col-form-label form-label">Category</label>
+                <div class="col-sm-9">
+                  <select class="form-select" id="category" formControlName="category">
+                    <option value="hardware">Hardware</option>
+                    <option value="software">Software</option>
+                    <option value="network">Network</option>
+                    <option value="account">Account</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="priority" class="col-sm-3 col-form-label form-label">Priority</label>
+                <div class="col-sm-9">
+                  <select class="form-select" id="priority" formControlName="priority">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="status" class="col-sm-3 col-form-label form-label">Status</label>
+                <div class="col-sm-9">
+                  <select class="form-select" id="status" formControlName="status">
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Closed">Closed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="assignedTechnician" class="col-sm-3 col-form-label form-label">Assigned technician</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" id="assignedTechnician" formControlName="assignedTechnician"
+                         placeholder="e.g. Musa Ibrahim">
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="description" class="col-sm-3 col-form-label form-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea class="form-control" id="description" rows="4" formControlName="description"
+                            [ngClass]="{'is-invalid': form.get('description')?.invalid && form.get('description')?.touched}"></textarea>
+                  <div *ngIf="form.get('description')?.invalid && form.get('description')?.touched" class="invalid-feedback">
+                    Description is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-4">
+                <label for="adminNotes" class="col-sm-3 col-form-label form-label">ICT team notes</label>
+                <div class="col-sm-9">
+                  <textarea class="form-control" id="adminNotes" rows="3" formControlName="adminNotes"
+                            placeholder="Internal notes, visible to the reporter on the track-status page"></textarea>
+                </div>
+              </div>
+
+            </form>
+          </div>
+          <div class="card-footer d-flex justify-content-end gap-2">
+            <button (click)="cancel()" type="button" class="btn btn-white">Cancel</button>
+            <button (click)="submit()" type="button" class="btn btn-primary" [disabled]="form.invalid">
+              {{ isEditMode ? 'Save changes' : 'Create issue' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

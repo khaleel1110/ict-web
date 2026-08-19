@@ -6,7 +6,7 @@ $root-path:                                                 "../";
 
 
 // Grays
-$gray-100:                                                  #f7faff;
+$gray-100:                                                  #f9fafc;
 $gray-200:                                                  #f8fafd;
 $gray-300:                                                  #e7eaf3;
 $gray-400:                                                  #bdc5d1;
@@ -18,17 +18,18 @@ $gray-900:                                                  #1e2022;
 
 // Colors
 $white:                                                     #fff;
-$dark: #0a4c2e;
+$dark:    #1E1200;
 $blue:                                                      #377dff;
 $teal:                                                      #00c9a7;
 $cyan:                                                      #09a5be;
 $yellow:                                                    #f5ca99;
 $red:                                                       #ed4c78;
 
+
 // Theme Colors
-$primary: #a67a3b;
+$primary:                                                   #A67A3B;
 $secondary:                                                 rgba($dark, .8);
-$success: #3d8159;
+$success:                                                   $teal;
 $info:                                                      $cyan;
 $warning:                                                   $yellow;
 $danger:                                                    $red;
@@ -43,3 +44,4 @@ $warning-soft:                                              rgba($warning, .1);
 $danger-soft:                                               rgba($danger, .1);
 $light-soft:                                                rgba($gray-100, .1);
 $dark-soft:                                                 rgba($dark, .1);
+$page-header-border-color: $dark-soft;

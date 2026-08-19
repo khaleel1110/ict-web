@@ -1,11 +1,11 @@
 
 
-<header id="header" class="header bg-white navbar navbar-expand-lg navbar-end navbar-sticky-lg-top navbar-light">
+<header style="overflow: hidden"  id="header" class="header bg-white navbar navbar-expand-lg navbar-end navbar-sticky-lg-top navbar-light">
   <div class="container-fluid">
     <nav class="js-mega-menu navbar-nav-wrap">
       <!-- Default Logo -->
       <a class="navbar-brand" routerLink="/" aria-label="Tibet">
-        <img style="height: 4rem; width: 7rem; object-fit: cover" src="/my-logo.png" alt="Logo">
+        <img style="height: 5rem;  object-fit: cover" src="/baba-ahad-logo.png" alt="Logo">
       </a>
       <!-- End Default Logo -->
 
@@ -19,7 +19,7 @@
       <ng-template #content let-offcanvas>
         <div class="offcanvas-header">
           <h4 class="offcanvas-title" id="offcanvas-basic-title"><a class="navbar-brand" routerLink="/" aria-label="Tibet">
-            <img style="height: 100px;width: 100px" src="/my-logo.png" alt="Logo">
+            <img style="height: 100px;width: 100px" src="/baba-ahad-logo.png" alt="Logo">
           </a></h4>
           <button type="button" class="btn-close" aria-label="Close" (click)="offcanvas.dismiss('Cross click')"></button>
         </div>
@@ -31,11 +31,15 @@
             <!-- End Blog -->
 
             <!-- Blog -->
-
             <li class="hs-has-sub-menu nav-item">
               <a class="hs-mega-menu-invoker nav-link " routerLink="home" role="button">Home</a>
             </li>
             <li class="hs-has-sub-menu nav-item">
+              <a class="hs-mega-menu-invoker nav-link " routerLink="report-issue" role="button">Report Issue</a>
+            </li>
+   <!--         <li class="hs-has-sub-menu nav-item">
+              <a class="hs-mega-menu-invoker nav-link " routerLink="booking" role="button">Booking</a>
+            </li>    <li class="hs-has-sub-menu nav-item">
               <a class="hs-mega-menu-invoker nav-link " routerLink="booking" role="button">Booking</a>
             </li>
             <li class="hs-has-sub-menu nav-item">
@@ -45,7 +49,7 @@
               <a class="hs-mega-menu-invoker nav-link " routerLink="blog" role="button">Blog</a>
             </li>
 
-
+-->
             <!-- End Button -->
           </ul>
 
@@ -55,11 +59,11 @@
         <div class="offcanvas-footer">
 
           <div class="mb-6 px-5 mx-3 gx-2 g-3 text-center">
-            <a class="btn btn-outline-primary btn-sm btn-transition mt-2" routerLink="booking">
+          <!--  <a class="btn btn-outline-primary btn-sm btn-transition mt-2" routerLink="booking">
               <i class="bi bi-bookmark-check"></i> Booking</a>
-
-            <a class="btn btn-outline-secondary btn-sm btn-transition mt-2" routerLink="contact-us"><i
-              class="bi-chat-left"></i> Contact us</a>
+-->
+            <a class="btn btn-outline-secondary btn-sm btn-transition mt-2" routerLink="admin/login"><i
+              class="bi-chat-left"></i> Admin</a>
           </div>
 
 
@@ -253,19 +257,19 @@
             <a class="hs-mega-menu-invoker nav-link " routerLink="/home" role="button">Home</a>
           </li>
           <li class="hs-has-sub-menu nav-item">
-            <a class="hs-mega-menu-invoker nav-link " routerLink="/booking" role="button">Booking</a>
+            <a class="hs-mega-menu-invoker nav-link " routerLink="/report-issue" role="button">Report issue</a>
           </li>
-          <li class="hs-has-sub-menu nav-item">
+     <!--     <li class="hs-has-sub-menu nav-item">
             <a class="hs-mega-menu-invoker nav-link " routerLink="about-us" routerLinkActive="active" role="button">About</a>
           </li>
 
-        <!--  <li class="hs-has-sub-menu nav-item">
+        &lt;!&ndash;  <li class="hs-has-sub-menu nav-item">
             <a class="hs-mega-menu-invoker nav-link " routerLink="/debug" routerLinkActive="active" role="button">debug</a>
-          </li>-->
+          </li>&ndash;&gt;
           <li class="hs-has-sub-menu nav-item">
             <a class="hs-mega-menu-invoker nav-link " routerLinkActive="active" routerLink="/blog" role="button">Blog</a>
           </li>
-
+-->
 
           <!-- End Button -->
         </ul>
@@ -286,7 +290,7 @@
             </li>-->
 
           <li class="nav-item">
-            <a routerLink="/contact-us" routerLinkActive="active" class="btn btn-soft-dark btn-transition">Contact Us </a>
+            <a routerLink="/admin/login" routerLinkActive="active" class="btn btn-soft-dark btn-transition">Admin </a>
 
           </li>
 

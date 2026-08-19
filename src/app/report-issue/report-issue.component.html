@@ -1,0 +1,203 @@
+<!-- report-issue.component.html -->
+<main id="content" role="main" class="bg-light">
+  <!-- Breadcrumb -->
+  <div class="navbar-dark bg-dark mt-5" style="background-image: url(/assets/svg/components/wave-pattern-light.svg);">
+    <div class="container content-space-1 content-space-b-lg-3">
+      <div class="row align-items-center">
+        <div class="col">
+          <div class="d-none d-lg-block">
+            <h1 class="h2 text-white">Report an ICT Issue</h1>
+          </div>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-light mb-0">
+              <li class="breadcrumb-item">Home</li>
+              <li class="breadcrumb-item">ICT Support</li>
+              <li class="breadcrumb-item active" aria-current="page">Report Issue</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="container content-space-1 content-space-t-lg-0 content-space-b-lg-2 mt-lg-n10">
+    <div class="row">
+      <div class="col-lg-2"></div>
+      <div class="col-lg-10">
+        <div class="d-grid gap-3 gap-lg-5">
+
+          <!-- Confirmation card, shown after successful submission -->
+          <div class="card" *ngIf="submittedIssue">
+            <div class="card-body text-center py-5">
+              <div class="mb-3">
+                <span class="bi-check-circle text-success" style="font-size: 3rem;"></span>
+              </div>
+              <h3 class="card-title">Complaint submitted</h3>
+              <p class="card-text">
+                Your ticket has been logged. A confirmation email has been sent to
+                <strong>{{ submittedIssue.email }}</strong>.
+              </p>
+              <p class="h4 text-primary mb-4">Ticket ID: {{ submittedIssue.ticketId }}</p>
+              <p class="text-muted small mb-4">
+                Keep this ticket ID — you can use it with your email on the
+                <a routerLink="/track">Track Status</a> page to check progress.
+              </p>
+              <button (click)="reportAnother()" type="button" class="btn btn-primary">
+                Report another issue
+              </button>
+            </div>
+          </div>
+
+          <!-- Report form -->
+          <div class="card" *ngIf="!submittedIssue">
+            <div class="card-header border-bottom py-4">
+              <h4 class="card-header-title">Complaint details</h4>
+            </div>
+            <div class="card-body">
+              <form [formGroup]="issueForm" id="reportIssueForm" aria-live="polite">
+
+                <!-- Full Name -->
+                <div class="row mb-4">
+                  <label for="firstName" class="col-sm-3 col-form-label form-label">Full name</label>
+                  <div class="col-sm-9">
+                    <div class="input-group">
+                      <input type="text" class="form-control" id="firstName" formControlName="firstName"
+                             placeholder="First name" aria-label="First name" aria-describedby="firstNameError"
+                             [ngClass]="{'is-invalid': issueForm.get('firstName')?.invalid && issueForm.get('firstName')?.touched}">
+                      <div *ngIf="issueForm.get('firstName')?.invalid && issueForm.get('firstName')?.touched" id="firstNameError" class="invalid-feedback">
+                        <span *ngIf="issueForm.get('firstName')?.errors?.['required']">First name is required</span>
+                        <span *ngIf="issueForm.get('firstName')?.errors?.['minlength']">First name must be at least 2 characters</span>
+                      </div>
+                      <input type="text" class="form-control" id="lastName" formControlName="lastName"
+                             placeholder="Last name" aria-label="Last name" aria-describedby="lastNameError"
+                             [ngClass]="{'is-invalid': issueForm.get('lastName')?.invalid && issueForm.get('lastName')?.touched}">
+                      <div *ngIf="issueForm.get('lastName')?.invalid && issueForm.get('lastName')?.touched" id="lastNameError" class="invalid-feedback">
+                        <span *ngIf="issueForm.get('lastName')?.errors?.['required']">Last name is required</span>
+                        <span *ngIf="issueForm.get('lastName')?.errors?.['minlength']">Last name must be at least 2 characters</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="row mb-4">
+                  <label for="email" class="col-sm-3 col-form-label form-label">Email</label>
+                  <div class="col-sm-9">
+                    <input type="email" class="form-control" id="email" formControlName="email"
+                           placeholder="you@example.com" aria-label="you@example.com" aria-describedby="emailError"
+                           [ngClass]="{'is-invalid': issueForm.get('email')?.invalid && issueForm.get('email')?.touched}">
+                    <div *ngIf="issueForm.get('email')?.invalid && issueForm.get('email')?.touched" id="emailError" class="invalid-feedback">
+                      <span *ngIf="issueForm.get('email')?.errors?.['required']">Email is required</span>
+                      <span *ngIf="issueForm.get('email')?.errors?.['email']">Invalid email format</span>
+                    </div>
+                    <div class="form-text">Used to send a confirmation and to look up your ticket later.</div>
+                  </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="row mb-4">
+                  <label for="phone" class="col-sm-3 col-form-label form-label">Phone</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="phone" formControlName="phone"
+                           placeholder="07012345678 or +2347012345678" aria-label="Phone" aria-describedby="phoneError"
+                           [ngClass]="{'is-invalid': issueForm.get('phone')?.invalid && issueForm.get('phone')?.touched}">
+                    <div *ngIf="issueForm.get('phone')?.invalid && issueForm.get('phone')?.touched" id="phoneError" class="invalid-feedback">
+                      <span *ngIf="issueForm.get('phone')?.errors?.['pattern']">Invalid Nigerian phone format (e.g., 07012345678 or +2347012345678)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Department -->
+                <div class="row mb-4">
+                  <label for="department" class="col-sm-3 col-form-label form-label">Department / Unit</label>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="department" formControlName="department"
+                           placeholder="e.g. Computer Science, Registry, Bursary" aria-label="Department">
+                  </div>
+                </div>
+
+                <!-- Category -->
+                <div class="row mb-4">
+                  <label for="category" class="col-sm-3 col-form-label form-label">Issue category</label>
+                  <div class="col-sm-9">
+                    <select class="form-select" id="category" formControlName="category"
+                            [ngClass]="{'is-invalid': issueForm.get('category')?.invalid && issueForm.get('category')?.touched}">
+                      <option value="" disabled selected>Select issue type</option>
+                      <option value="hardware">Hardware fault</option>
+                      <option value="software">Software fault</option>
+                      <option value="network">Network / Internet</option>
+                      <option value="account">Account / Access</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <div *ngIf="issueForm.get('category')?.invalid && issueForm.get('category')?.touched" class="invalid-feedback">
+                      <span *ngIf="issueForm.get('category')?.errors?.['required']">Issue category is required</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Priority -->
+                <div class="row mb-4">
+                  <label class="col-sm-3 col-form-label form-label">Priority</label>
+                  <div class="col-sm-9">
+                    <div class="input-group input-group-md-down-break">
+                      <label class="form-control" for="priorityLow">
+                        <span class="form-check">
+                          <input type="radio" class="form-check-input" id="priorityLow" value="Low" formControlName="priority">
+                          <span class="form-check-label">Low</span>
+                        </span>
+                      </label>
+                      <label class="form-control" for="priorityMedium">
+                        <span class="form-check">
+                          <input type="radio" class="form-check-input" id="priorityMedium" value="Medium" formControlName="priority">
+                          <span class="form-check-label">Medium</span>
+                        </span>
+                      </label>
+                      <label class="form-control" for="priorityHigh">
+                        <span class="form-check">
+                          <input type="radio" class="form-check-input" id="priorityHigh" value="High" formControlName="priority">
+                          <span class="form-check-label">High</span>
+                        </span>
+                      </label>
+                      <label class="form-control" for="priorityCritical">
+                        <span class="form-check">
+                          <input type="radio" class="form-check-input" id="priorityCritical" value="Critical" formControlName="priority">
+                          <span class="form-check-label">Critical</span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <div class="row mb-4">
+                  <label for="description" class="col-sm-3 col-form-label form-label">Describe the issue</label>
+                  <div class="col-sm-9">
+                    <textarea class="form-control" id="description" rows="4" formControlName="description"
+                              placeholder="What's happening? When did it start? Any error messages?"
+                              [ngClass]="{'is-invalid': issueForm.get('description')?.invalid && issueForm.get('description')?.touched}"></textarea>
+                    <div *ngIf="issueForm.get('description')?.invalid && issueForm.get('description')?.touched" class="invalid-feedback">
+                      <span *ngIf="issueForm.get('description')?.errors?.['required']">Description is required</span>
+                      <span *ngIf="issueForm.get('description')?.errors?.['minlength']">Please add a bit more detail (min 10 characters)</span>
+                    </div>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+              <a routerLink="/track" class="link">Already reported? Track your ticket</a>
+              <button (click)="handleSubmit()" type="button" class="btn btn-primary"
+                      [disabled]="issueForm.invalid || isSubmitting"
+                      [attr.title]="issueForm.invalid ? 'Please fill all required fields' : isSubmitting ? 'Submitting...' : ''">
+                <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isSubmitting ? 'Submitting...' : 'Submit Complaint' }}
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
