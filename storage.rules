@@ -1,12 +1,34 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // Example: profile photos, publicly viewable, only writable by an
+    // admin (or the user themselves, if you later let users upload their
+    // own avatar — swap the condition below for that if needed).
+    match /avatars/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Deny everything else by default.
     match /{allPaths=**} {
       allow read, write: if false;
     }
   }
 }
+
+// Note: your CreateUsers CLI currently uses external avatar URLs
+// (ui-avatars.com) rather than uploading to Firebase Storage, so the
+// /avatars path above isn't in use yet — it's here as a ready-made rule
+// for whenever you do start uploading files (e.g. attachments on a
+// ticket). If you don't need Storage at all right now, the safe default
+// is to leave it as "allow read, write: if false" everywhere.

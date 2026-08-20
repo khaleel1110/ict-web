@@ -2,13 +2,13 @@ export const environment = {
   production: false,
   useEmulator: true,
   firebaseApp: {
-    projectId: "aside-5ecd0",
-    appId: "1:748481180715:web:11d794732373088027a66e",
-    storageBucket: "aside-5ecd0.firebasestorage.app",
-    apiKey: "AIzaSyC5UirJ4P6LwgSh0oy1W1Jixjm-iwgduhg",
-    authDomain: "aside-5ecd0.firebaseapp.com",
-    messagingSenderId: "748481180715",
-    measurementId: "G-9QM1QJLQ0M"
+    apiKey: "AIzaSyCK_VTEKdnWkTy2GaJRZxlhnqz2CLH7SbU",
+    authDomain: "unique-phones.firebaseapp.com",
+    projectId: "unique-phones",
+    storageBucket: "unique-phones.appspot.com",
+    messagingSenderId: "61875675000",
+    appId: "1:61875675000:web:3e55a2b05b25bb5fa3328d",
+    measurementId: "G-L6DV0ZTZR4"
   },
   paystackPublicKey: 'pk_test_de07139d9eacbf37b7d3fd533f82838cfeb58c12',
   emailjsUserId: 'ZLVO8-Ff1dXXnWvZU', // Replace with your actual EmailJS User ID from https://dashboard.emailjs.com/admin/account

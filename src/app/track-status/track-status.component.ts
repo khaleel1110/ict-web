@@ -16,6 +16,7 @@ export class TrackStatusComponent {
   result: Issue | null = null;
   notFound = false;
   searched = false;
+  isSearching = false;
 
   constructor(private fb: FormBuilder, private issueService: IssueService) {
     this.searchForm = this.fb.group({
@@ -24,21 +25,28 @@ export class TrackStatusComponent {
     });
   }
 
-  search(): void {
+  async search(): Promise<void> {
     if (this.searchForm.invalid) {
       this.searchForm.markAllAsTouched();
       return;
     }
+
+    this.isSearching = true;
     this.searched = true;
     const { ticketId, email } = this.searchForm.value;
-    const found = this.issueService.getByTicketId(ticketId);
 
-    if (found && found.email.toLowerCase() === String(email).toLowerCase()) {
-      this.result = found;
-      this.notFound = false;
-    } else {
-      this.result = null;
-      this.notFound = true;
+    try {
+      const found = await this.issueService.getByTicketId(ticketId);
+
+      if (found && found.email.toLowerCase() === String(email).toLowerCase()) {
+        this.result = found;
+        this.notFound = false;
+      } else {
+        this.result = null;
+        this.notFound = true;
+      }
+    } finally {
+      this.isSearching = false;
     }
   }
 

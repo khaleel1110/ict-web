@@ -1,18 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
-import {Router, RouterLink} from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './admin-login.component.html',
 })
 export class AdminLoginComponent {
@@ -20,11 +15,7 @@ export class AdminLoginComponent {
   errorMessage = '';
   isLoading = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
@@ -37,45 +28,36 @@ export class AdminLoginComponent {
       return;
     }
 
-    this.errorMessage = '';
     this.isLoading = true;
+    this.errorMessage = '';
 
     const { email, password } = this.loginForm.value;
 
     try {
       await this.auth.login(email, password);
-
-      await this.router.navigate(['/admin/issues']);
+      this.router.navigate(['/admin/issues']);
     } catch (error: any) {
-      console.error('Login error:', error);
-
-      switch (error?.code) {
-        case 'auth/invalid-credential':
-        case 'auth/wrong-password':
-        case 'auth/user-not-found':
-          this.errorMessage = 'Invalid email or password.';
-          break;
-
-        case 'auth/invalid-email':
-          this.errorMessage = 'Please enter a valid email address.';
-          break;
-
-        case 'auth/user-disabled':
-          this.errorMessage =
-            'This account has been disabled. Please contact the administrator.';
-          break;
-
-        case 'auth/too-many-requests':
-          this.errorMessage =
-            'Too many login attempts. Please try again later.';
-          break;
-
-        default:
-          this.errorMessage =
-            'Unable to sign in. Please check your connection and try again.';
-      }
+      this.errorMessage = this.mapError(error);
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  private mapError(error: any): string {
+    switch (error?.code) {
+      case 'auth/invalid-email':
+        return 'Invalid email address.';
+      case 'auth/user-disabled':
+        return 'This account has been disabled.';
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        return 'Incorrect email or password.';
+      case 'auth/too-many-requests':
+        return 'Too many attempts. Please try again in a moment.';
+      default:
+        // Covers the "no admin access" Error thrown by AuthService.login()
+        return error?.message || 'Unable to sign in. Please try again.';
     }
   }
 }

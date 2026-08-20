@@ -1,85 +1,451 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Issue } from '../models/issue.model';
+import {Injectable, inject} from '@angular/core';
 
-const STORAGE_KEY = 'ict_support_issues';
+import {
+  Firestore,
+  collection,
+  collectionData,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  runTransaction,
+  orderBy,
+  query,
+} from '@angular/fire/firestore';
+
+import {BehaviorSubject, Observable, Subscription} from 'rxjs';
+import {map} from 'rxjs/operators';
+
+import {Issue} from '../models/issue.model';
 
 /**
- * IssueService — in-browser data layer for the ICT Support system.
+ * Firestore collection used by the ICT support system.
  *
- * This currently persists to localStorage so the app is fully workable
- * on its own. When the real backend (Firestore/Node API per the project
- * background) is ready, swap the body of these methods for HttpClient /
- * AngularFire calls — the public method signatures can stay the same,
- * so components using this service won't need to change.
+ * All reported complaints/issues are stored here:
+ *
+ * report-issue/
+ *   ICT-0001-ab12
+ *   ICT-0002-cd34
+ *   ...
  */
-@Injectable({ providedIn: 'root' })
-export class IssueService {
-  private issuesSubject = new BehaviorSubject<Issue[]>(this.loadFromStorage());
-  issues$: Observable<Issue[]> = this.issuesSubject.asObservable();
+const COLLECTION = 'report-issue';
 
-  private loadFromStorage(): Issue[] {
+/**
+ * Counter used to generate ticket numbers.
+ *
+ * counters/report-issue
+ */
+const COUNTER_DOC = 'counters/report-issue';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class IssueService {
+  private readonly firestore = inject(Firestore);
+
+  private readonly issuesCollection = collection(
+    this.firestore,
+    COLLECTION
+  );
+
+  private subscription?: Subscription;
+
+  // ---------------------------------------------------------
+  // LOADING STATE
+  // ---------------------------------------------------------
+
+  private readonly loadingSubject =
+    new BehaviorSubject<boolean>(true);
+
+  readonly isLoading$ =
+    this.loadingSubject.asObservable();
+
+  // ---------------------------------------------------------
+  // ERROR STATE
+  // ---------------------------------------------------------
+
+  private readonly errorSubject =
+    new BehaviorSubject<string | null>(null);
+
+  readonly error$ =
+    this.errorSubject.asObservable();
+
+  // ---------------------------------------------------------
+  // ISSUES DATA
+  // ---------------------------------------------------------
+
+  private readonly issuesSubject =
+    new BehaviorSubject<Issue[]>([]);
+
+  readonly issues$ =
+    this.issuesSubject.asObservable();
+
+  // ---------------------------------------------------------
+  // CONSTRUCTOR
+  // ---------------------------------------------------------
+
+  constructor() {
+    this.loadIssues();
+  }
+
+  // =========================================================
+  // LOAD ALL ISSUES
+  // =========================================================
+
+  private loadIssues(): void {
+    this.loadingSubject.next(true);
+    this.errorSubject.next(null);
+
+    const issuesQuery = query(
+      this.issuesCollection,
+      orderBy('dateReported', 'desc')
+    );
+
+    this.subscription = collectionData(issuesQuery, {
+      idField: 'id',
+    })
+      .pipe(
+        map((items) => items as Issue[])
+      )
+      .subscribe({
+        next: (issues) => {
+          this.issuesSubject.next(issues);
+          this.loadingSubject.next(false);
+
+          console.log(
+            `Loaded ${issues.length} issues from Firestore collection "${COLLECTION}".`
+          );
+        },
+
+        error: (error) => {
+          console.error(
+            `Error loading Firestore collection "${COLLECTION}":`,
+            error
+          );
+
+          this.loadingSubject.next(false);
+
+          this.errorSubject.next(
+            'Unable to load reported issues from Firestore.'
+          );
+        },
+      });
+  }
+
+  // =========================================================
+  // GET ONE ISSUE
+  // =========================================================
+
+  async getById(
+    id: string
+  ): Promise<Issue | undefined> {
+    if (!id) {
+      return undefined;
+    }
+
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
+      const issueRef = doc(
+        this.firestore,
+        COLLECTION,
+        id
+      );
+
+      const snap = await getDoc(issueRef);
+
+      if (!snap.exists()) {
+        return undefined;
+      }
+
+      return {
+        id: snap.id,
+        ...snap.data(),
+      } as Issue;
+    } catch (error) {
+      console.error(
+        'Error getting issue:',
+        error
+      );
+
+      throw error;
     }
   }
 
-  private saveToStorage(issues: Issue[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(issues));
-    this.issuesSubject.next(issues);
+  // =========================================================
+  // GET ISSUE BY TICKET ID
+  // =========================================================
+
+  async getByTicketId(
+    ticketId: string
+  ): Promise<Issue | undefined> {
+    return this.getById(ticketId.trim());
   }
 
-  getAll(): Issue[] {
-    return this.issuesSubject.value;
+  // =========================================================
+  // CREATE ISSUE
+  // =========================================================
+
+  async create(
+    data: Omit<
+      Issue,
+      | 'id'
+      | 'ticketId'
+      | 'status'
+      | 'dateReported'
+      | 'dateUpdated'
+    >
+  ): Promise<Issue> {
+
+    this.errorSubject.next(null);
+
+    try {
+      // Generate ticket number
+      const ticketId =
+        await this.generateTicketId();
+
+      const now =
+        new Date().toISOString();
+
+      const issueData: Omit<Issue, 'id'> = {
+        ...data,
+
+        ticketId,
+
+        status: 'Open',
+
+        dateReported: now,
+
+        dateUpdated: now,
+      };
+
+      // -----------------------------------------------------
+      // IMPORTANT:
+      // Ticket ID is also the Firestore document ID.
+      //
+      // report-issue/ICT-0001-ab12
+      // -----------------------------------------------------
+
+      const issueRef = doc(
+        this.firestore,
+        COLLECTION,
+        ticketId
+      );
+
+      await setDoc(
+        issueRef,
+        issueData
+      );
+
+      const createdIssue: Issue = {
+        id: ticketId,
+        ...issueData,
+      };
+
+      // Update local observable immediately
+      // so the admin UI doesn't need to wait for
+      // another page refresh.
+      this.issuesSubject.next([
+        createdIssue,
+        ...this.issuesSubject.value,
+      ]);
+
+      console.log(
+        'Issue successfully created:',
+        createdIssue
+      );
+
+      return createdIssue;
+
+    } catch (error) {
+
+      console.error(
+        'Failed to create issue:',
+        error
+      );
+
+      this.errorSubject.next(
+        'Failed to submit the issue to Firestore.'
+      );
+
+      throw error;
+    }
   }
 
-  getById(id: string): Issue | undefined {
-    return this.issuesSubject.value.find((i) => i.id === id);
+  // =========================================================
+  // UPDATE ISSUE
+  // =========================================================
+
+  async update(
+    id: string,
+    changes: Partial<Issue>
+  ): Promise<void> {
+
+    if (!id) {
+      throw new Error(
+        'Issue ID is required.'
+      );
+    }
+
+    try {
+
+      const issueRef = doc(
+        this.firestore,
+        COLLECTION,
+        id
+      );
+
+      await updateDoc(
+        issueRef,
+        {
+          ...changes,
+          dateUpdated:
+            new Date().toISOString(),
+        }
+      );
+
+      console.log(
+        `Issue ${id} updated successfully.`
+      );
+
+    } catch (error) {
+
+      console.error(
+        `Failed to update issue ${id}:`,
+        error
+      );
+
+      throw error;
+    }
   }
 
-  getByTicketId(ticketId: string): Issue | undefined {
-    return this.issuesSubject.value.find(
-      (i) => i.ticketId.toLowerCase() === ticketId.trim().toLowerCase()
+  // =========================================================
+  // DELETE ISSUE
+  // =========================================================
+
+  async delete(
+    id: string
+  ): Promise<void> {
+
+    if (!id) {
+      return;
+    }
+
+    try {
+
+      const issueRef = doc(
+        this.firestore,
+        COLLECTION,
+        id
+      );
+
+      await deleteDoc(issueRef);
+
+      // Remove immediately from local state
+      this.issuesSubject.next(
+        this.issuesSubject.value.filter(
+          (issue) => issue.id !== id
+        )
+      );
+
+      console.log(
+        `Issue ${id} deleted successfully.`
+      );
+
+    } catch (error) {
+
+      console.error(
+        `Failed to delete issue ${id}:`,
+        error
+      );
+
+      throw error;
+    }
+  }
+
+  // =========================================================
+  // GET ALL
+  // =========================================================
+
+  getAll(): Observable<Issue[]> {
+    return this.issues$;
+  }
+
+  // =========================================================
+  // GET COUNT
+  // =========================================================
+
+  getCount(): Observable<number> {
+    return this.issues$.pipe(
+      map(
+        (issues) => issues.length
+      )
     );
   }
 
-  create(
-    data: Omit<Issue, 'id' | 'ticketId' | 'status' | 'dateReported' | 'dateUpdated'>
-  ): Issue {
-    const issues = this.issuesSubject.value;
-    const now = new Date().toISOString();
-    const nextNumber = issues.length + 1;
+  // =========================================================
+  // GENERATE TICKET ID
+  // =========================================================
 
-    const newIssue: Issue = {
-      ...data,
-      id: this.generateId(),
-      ticketId: `ICT-${String(nextNumber).padStart(4, '0')}`,
-      status: 'Open',
-      dateReported: now,
-      dateUpdated: now,
-    };
+  private async generateTicketId(): Promise<string> {
 
-    this.saveToStorage([newIssue, ...issues]);
-    return newIssue;
-  }
-
-  update(id: string, changes: Partial<Issue>): void {
-    const issues = this.issuesSubject.value.map((i) =>
-      i.id === id ? { ...i, ...changes, dateUpdated: new Date().toISOString() } : i
+    const counterRef = doc(
+      this.firestore,
+      COUNTER_DOC
     );
-    this.saveToStorage(issues);
+
+    const nextNumber =
+      await runTransaction(
+        this.firestore,
+        async (transaction) => {
+
+          const snapshot =
+            await transaction.get(
+              counterRef
+            );
+
+          const current =
+            snapshot.exists()
+              ? Number(
+                snapshot.data()['count'] ?? 0
+              )
+              : 0;
+
+          const next =
+            current + 1;
+
+          transaction.set(
+            counterRef,
+            {
+              count: next,
+              updatedAt:
+                new Date().toISOString(),
+            },
+            {
+              merge: true,
+            }
+          );
+
+          return next;
+        }
+      );
+
+    const suffix =
+      Math.random()
+        .toString(36)
+        .substring(2, 6)
+        .toUpperCase();
+
+    return `ICT-${String(nextNumber).padStart(
+      4,
+      '0'
+    )}-${suffix}`;
   }
 
-  delete(id: string): void {
-    this.saveToStorage(this.issuesSubject.value.filter((i) => i.id !== id));
-  }
+  // =========================================================
+  // CLEANUP
+  // =========================================================
 
-  private generateId(): string {
-    return typeof crypto !== 'undefined' && 'randomUUID' in crypto
-      ? crypto.randomUUID()
-      : `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 }

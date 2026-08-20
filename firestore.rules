@@ -2,8 +2,56 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    // Users can read/update their own profile document; only admins can
+    // read or write other users' documents (e.g. from the admin dashboard).
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin() || (isSignedIn() && request.auth.uid == userId);
+    }
+
+    // ICT support tickets, keyed by ticket ID (e.g. "ICT-0007-4f2a").
+    // - Anyone can file a new complaint (no login required).
+    // - A single ticket can be read directly by anyone who knows its ID —
+    //   this is what powers the public "track my ticket" page. The
+    //   reporter's email is checked client-side after the fetch, not here;
+    //   see the note below.
+    // - Listing/browsing all tickets, and updating or deleting one, is
+    //   admin-only.
+    match /issues/{ticketId} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // Shared counter used only inside IssueService's ticket-numbering
+    // transaction. Tighten this (e.g. isAdmin()-only writes via a Cloud
+    // Function) if you ever add another writer to this doc.
+    match /counters/{counterId} {
+      allow get, write: if true;
+    }
+
+    // Deny everything else by default — nothing is accidentally left open.
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }
+
+// NOTE on /issues/{ticketId} `allow get: if true`:
+// Knowing (or guessing) a ticket ID is enough to read that ticket's full
+// details — the email match on the track-status page happens in the
+// Angular app, not in this rule. The random suffix on generated ticket
+// IDs makes blind guessing impractical, but it is not a server-enforced
+// guarantee. If these tickets could ever contain sensitive information,
+// replace this with a Cloud Function that verifies the email server-side
+// before returning the document.
